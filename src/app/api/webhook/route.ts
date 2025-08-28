@@ -12,6 +12,7 @@ import { db } from "@/db";
 import { agents, meetings } from "@/db/schema";
 import { streamVideo } from "@/lib/stream-video";
 import { error } from "console";
+import { inngest } from "@/inngest/client";
 
 function verifySignatureWithSDK(body: string, signature: string): boolean {
   return streamVideo.verifyWebhook(body, signature);
@@ -135,6 +136,14 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: "Meeting not found" }, { status: 404 });
       }
       
+    await inngest.send({
+      name: "meetings/processinig",
+      data: {
+        meetingId: updatedMeeting.id,
+        transcriptUrl: updatedMeeting.transcriptUrl,
+      },
+    });
+    
   } else if (eventType === "call.recording_ready") {
       const event = payload as CallRecordingReadyEvent;
       const meetingId = event.call_cid.split(":")[1];
