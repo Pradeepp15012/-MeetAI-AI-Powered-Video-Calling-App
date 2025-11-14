@@ -19,6 +19,8 @@ interface Props{
     onJoin: () => void;  
 };
 
+// disableVideoPreview Function
+
 const disableVideoPreview = () => {
     const { data } = authClient.useSession();
 
